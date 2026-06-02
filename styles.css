@@ -199,16 +199,17 @@ ul { list-style: none; }
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background: url('hero_bg.png') center center / cover no-repeat;
+  background: url('hero_bg.png') center top / cover no-repeat;
   z-index: 0;
+  transform: scale(1.02); /* subtle scale to avoid white edges on zoom */
 }
 .hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(
-    135deg,
-    rgba(6,14,31,0.92) 0%,
-    rgba(10,22,40,0.85) 40%,
-    rgba(13,31,60,0.75) 100%
+    160deg,
+    rgba(6,14,31,0.78) 0%,
+    rgba(10,22,40,0.65) 45%,
+    rgba(13,31,60,0.55) 100%
   );
   z-index: 1;
 }
@@ -267,15 +268,15 @@ ul { list-style: none; }
 }
 .hero-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(2rem, 5.8vw, 6.2rem);
+  font-size: clamp(2rem, 5.8vw, 5.8rem);
   font-weight: 900;
-  line-height: 1.0;
+  line-height: 1.05;
   color: var(--white);
   margin-bottom: 28px;
   animation: fadeInUp 0.9s 0.2s ease both;
   white-space: nowrap;
   width: 100%;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   display: block;
 }
 .hero-gradient {
@@ -1435,11 +1436,25 @@ ul { list-style: none; }
   .hamburger { display: flex; }
 
   /* ── Hero ── */
-  .hero { padding: 120px 20px 64px; }
+  .hero { padding: 120px 20px 64px; min-height: 100svh; }
+  .hero-bg {
+    background-position: center top;
+    background-size: cover;
+    transform: scale(1);
+  }
+  .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(6,14,31,0.72) 0%,
+      rgba(10,22,40,0.60) 50%,
+      rgba(6,14,31,0.80) 100%
+    );
+  }
   .hero-content { max-width: 100%; }
   .hero-title {
-    font-size: clamp(1.9rem, 8vw, 3.2rem);
+    font-size: clamp(1.75rem, 8vw, 3.2rem);
     white-space: normal;
+    word-break: break-word;
     letter-spacing: 0.01em;
     line-height: 1.1;
   }
@@ -1510,9 +1525,10 @@ ul { list-style: none; }
    RESPONSIVE — SMALL MOBILE (≤480px)
    ======================================== */
 @media (max-width: 480px) {
-  .hero          { padding: 110px 16px 56px; }
-  .hero-title    { font-size: clamp(1.65rem, 7.5vw, 2.4rem); }
-  .hero-badge    { font-size: 0.72rem; padding: 7px 16px; }
+  .hero          { padding: 110px 16px 56px; min-height: 100svh; }
+  .hero-bg       { background-position: center 20%; }
+  .hero-title    { font-size: clamp(1.5rem, 7.5vw, 2.2rem); white-space: normal; word-break: break-word; }
+  .hero-badge    { font-size: 0.68rem; padding: 6px 14px; letter-spacing: 0.08em; }
   .hero-stats    { padding: 16px 20px; }
 
   .container     { padding: 0 16px; }
