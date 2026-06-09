@@ -268,9 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cart.length === 0) { checkoutBtn.href = '#'; return; }
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-
-    // PayPal.me con monto automático en la URL (MXN)
-    checkoutBtn.href = `https://www.paypal.com/paypalme/consultoriajas/${subtotal}MXN`;
+    const url = `https://www.paypal.com/paypalme/consultoriajas/${subtotal}MXN`;
+    console.log('PayPal URL generada:', url);
+    checkoutBtn.href = url;
   }
 
   function renderCart() {
@@ -380,8 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateBadge();
     renderCart();
+    updateCheckoutLink(); // forzar actualización del link de pago
     showToast(name);
-    // Briefly show cart then close to indicate item was added
     openCart();
   };
 
