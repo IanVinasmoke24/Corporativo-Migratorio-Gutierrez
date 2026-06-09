@@ -72,8 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Smooth scroll for anchor links ───────────────
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', e => {
+      const href = anchor.getAttribute('href');
+      // Si el href ya no es un ancla local (fue cambiado a URL externa), dejar navegar normal
+      if (!href || !href.startsWith('#') || href.length <= 1) return;
       e.preventDefault();
-      const target = document.querySelector(anchor.getAttribute('href'));
+      const target = document.querySelector(href);
       if (target) {
         const offset = 80;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
