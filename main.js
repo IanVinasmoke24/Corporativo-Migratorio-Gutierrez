@@ -259,6 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     cartSubtotal.textContent = formatPrice(subtotal);
     cartTotal.textContent = formatPrice(subtotal);
+
+    // Actualizar automáticamente el link de MercadoPago con el total del carrito
+    const checkoutBtn = document.getElementById('cartCheckoutBtn');
+    if (checkoutBtn) {
+      const baseUrl = 'https://link.mercadopago.com.mx/consultoriajas';
+      checkoutBtn.href = subtotal > 0 ? `${baseUrl}?amount=${subtotal}` : baseUrl;
+    }
   }
 
   function renderCart() {
