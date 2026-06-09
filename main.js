@@ -259,13 +259,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     cartSubtotal.textContent = formatPrice(subtotal);
     cartTotal.textContent = formatPrice(subtotal);
+    updateCheckoutLink();
+  }
 
-    // Actualizar automáticamente el link de MercadoPago con el total del carrito
+  function updateCheckoutLink() {
     const checkoutBtn = document.getElementById('cartCheckoutBtn');
-    if (checkoutBtn) {
-      const baseUrl = 'https://link.mercadopago.com.mx/consultoriajas';
-      checkoutBtn.href = subtotal > 0 ? `${baseUrl}?amount=${subtotal}` : baseUrl;
-    }
+    if (!checkoutBtn) return;
+    if (cart.length === 0) { checkoutBtn.href = '#'; return; }
+
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+    // PayPal.me con monto automático en la URL (MXN)
+    checkoutBtn.href = `https://www.paypal.com/paypalme/consultoriajas/${subtotal}MXN`;
   }
 
   function renderCart() {
@@ -364,7 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Global addToCart function (called from onclick in HTML)
+  // Global functions (called from onclick in HTML)
+  window.handleCheckout = handleCheckout;
+
   window.addToCart = function(name, price) {
     const id = name.toLowerCase().replace(/\s+/g, '-');
     const existing = cart.find(i => i.id === id);
