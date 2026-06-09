@@ -369,9 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Global functions (called from onclick in HTML)
-  window.handleCheckout = handleCheckout;
-
+  // Global addToCart function (called from onclick in HTML)
   window.addToCart = function(name, price) {
     const id = name.toLowerCase().replace(/\s+/g, '-');
     const existing = cart.find(i => i.id === id);
