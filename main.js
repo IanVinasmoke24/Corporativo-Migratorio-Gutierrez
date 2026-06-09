@@ -204,4 +204,177 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Navbar scroll-spy effect ──────────────────────
   console.log('%cCMG – Corporativo Migratorio Gutiérrez', 'color: #c9a84c; font-size: 16px; font-weight: bold;');
   console.log('%cDiseño web premium', 'color: #888; font-size: 12px;');
+
+  // ── Shopping Cart ─────────────────────────────────
+  let cart = [];
+
+  const cartDrawer      = document.getElementById('cartDrawer');
+  const cartOverlay     = document.getElementById('cartOverlay');
+  const cartToggleBtn   = document.getElementById('cartToggleBtn');
+  const cartCloseBtn    = document.getElementById('cartCloseBtn');
+  const cartBadge       = document.getElementById('cartBadge');
+  const cartCountLabel  = document.getElementById('cartCountLabel');
+  const cartEmpty       = document.getElementById('cartEmpty');
+  const cartItemsList   = document.getElementById('cartItemsList');
+  const cartFooter      = document.getElementById('cartFooter');
+  const cartSubtotal    = document.getElementById('cartSubtotal');
+  const cartTotal       = document.getElementById('cartTotal');
+  const cartClearBtn    = document.getElementById('cartClearBtn');
+
+  function openCart() {
+    cartDrawer.classList.add('open');
+    cartOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCart() {
+    cartDrawer.classList.remove('open');
+    cartOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  cartToggleBtn.addEventListener('click', openCart);
+  cartCloseBtn.addEventListener('click', closeCart);
+  cartOverlay.addEventListener('click', closeCart);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && cartDrawer.classList.contains('open')) closeCart();
+  });
+
+  function formatPrice(n) {
+    return '$' + n.toLocaleString('es-MX') + ' MXN';
+  }
+
+  function updateBadge() {
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    if (totalQty > 0) {
+      cartBadge.textContent = totalQty;
+      cartBadge.style.display = 'flex';
+    } else {
+      cartBadge.style.display = 'none';
+    }
+    cartCountLabel.textContent = totalQty + (totalQty === 1 ? ' servicio' : ' servicios');
+  }
+
+  function updateTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    cartSubtotal.textContent = formatPrice(subtotal);
+    cartTotal.textContent = formatPrice(subtotal);
+  }
+
+  function renderCart() {
+    cartItemsList.innerHTML = '';
+    const hasItems = cart.length > 0;
+    cartEmpty.style.display = hasItems ? 'none' : 'flex';
+    cartItemsList.style.display = hasItems ? 'flex' : 'none';
+    cartFooter.style.display = hasItems ? 'block' : 'none';
+
+    cart.forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'cart-item';
+      li.innerHTML = `
+        <div class="cart-item-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <div class="cart-item-info">
+          <div class="cart-item-name" title="${item.name}">${item.name}</div>
+          <div class="cart-item-price">${formatPrice(item.price * item.qty)}</div>
+        </div>
+        <div class="cart-item-qty">
+          <button class="cart-qty-btn" data-id="${item.id}" data-action="dec">−</button>
+          <span class="cart-qty-num">${item.qty}</span>
+          <button class="cart-qty-btn" data-id="${item.id}" data-action="inc">+</button>
+        </div>
+        <button class="cart-item-remove" data-id="${item.id}" aria-label="Eliminar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      `;
+      cartItemsList.appendChild(li);
+    });
+
+    // Qty buttons
+    cartItemsList.querySelectorAll('.cart-qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        const idx = cart.findIndex(i => i.id === id);
+        if (idx === -1) return;
+        if (action === 'inc') {
+          cart[idx].qty++;
+        } else {
+          cart[idx].qty--;
+          if (cart[idx].qty <= 0) cart.splice(idx, 1);
+        }
+        updateBadge();
+        updateTotals();
+        renderCart();
+      });
+    });
+
+    // Remove buttons
+    cartItemsList.querySelectorAll('.cart-item-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        cart = cart.filter(i => i.id !== id);
+        updateBadge();
+        updateTotals();
+        renderCart();
+      });
+    });
+
+    updateTotals();
+    updateBadge();
+  }
+
+  // Clear cart
+  cartClearBtn.addEventListener('click', () => {
+    cart = [];
+    updateBadge();
+    renderCart();
+  });
+
+  // Show toast
+  let toastTimer;
+  function showToast(name) {
+    let toast = document.getElementById('cartToastEl');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'cartToastEl';
+      toast.className = 'cart-toast';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      ¡${name} agregado al carrito!
+    `;
+    clearTimeout(toastTimer);
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // Global addToCart function (called from onclick in HTML)
+  window.addToCart = function(name, price) {
+    const id = name.toLowerCase().replace(/\s+/g, '-');
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ id, name, price, qty: 1 });
+    }
+    updateBadge();
+    renderCart();
+    showToast(name);
+    // Briefly show cart then close to indicate item was added
+    openCart();
+  };
+
+  // Initialize cart UI
+  renderCart();
+
 });
+
