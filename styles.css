@@ -2174,3 +2174,159 @@ ul { list-style: none; }
     gap: 8px;
   }
 }
+
+/* ========================================
+   SUCCESS MODAL
+   ======================================== */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,14,31,0.85);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.success-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.success-modal {
+  background: linear-gradient(160deg, var(--navy-mid), var(--navy-deep));
+  border: 1px solid var(--gold-20);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  width: 90%;
+  max-width: 440px;
+  text-align: center;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+.success-overlay.active .success-modal {
+  transform: scale(1) translateY(0);
+}
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(37,211,102,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  border: 2px solid rgba(37,211,102,0.3);
+  animation: wa-pulse-anim 2s infinite;
+}
+.success-modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.success-modal p {
+  font-size: 0.95rem;
+  color: var(--white-80);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.success-instructions {
+  font-size: 0.88rem;
+  color: var(--gold-light);
+}
+.success-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--navy-deep);
+  border: 1px solid var(--white-20);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-size: 1rem;
+  margin-bottom: 24px;
+  transition: border-color 0.3s;
+}
+.success-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.success-btn-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: var(--navy-deep);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gold-20);
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 12px;
+}
+.success-btn-download:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.1);
+}
+.success-btn-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+  margin-bottom: 16px;
+}
+.success-btn-wa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37,211,102,0.5);
+}
+.success-btn-close {
+  background: transparent;
+  border: none;
+  color: var(--white-60);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.success-btn-close:hover {
+  color: var(--white);
+}
+
+/* ========================================
+   PRINT STYLES (FOR RECEIPT)
+   ======================================== */
+@media print {
+  body > *:not(#printReceiptArea) {
+    display: none !important;
+  }
+  #printReceiptArea {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+  }
+  @page {
+    margin: 20mm;
+    size: auto;
+  }
+}

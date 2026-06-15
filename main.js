@@ -423,11 +423,34 @@ document.addEventListener('DOMContentLoaded', () => {
           .then((res) => res.json())
           .then((captureData) => {
             if (captureData.status === "COMPLETED") {
+              const orderId = captureData.id || "N/A";
+              let payerName = "";
+              if (captureData.payer && captureData.payer.name) {
+                payerName = (captureData.payer.name.given_name || "") + " " + (captureData.payer.name.surname || "");
+                payerName = payerName.trim();
+              }
+              
+              const receiptData = {
+                orderId: orderId,
+                date: new Date().toLocaleString('es-MX'),
+                payer: payerName,
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+              };
+              window.lastReceiptData = receiptData;
+              
               cart = [];
               updateBadge();
               renderCart();
-              alert("¡Pago exitoso! Nos pondremos en contacto contigo pronto para tu servicio.");
               closeCart();
+              
+              const successOverlay = document.getElementById('successOverlay');
+              const successOrderId = document.getElementById('successOrderId');
+              const successClientName = document.getElementById('successClientName');
+              
+              if (successOrderId) successOrderId.textContent = orderId;
+              if (successClientName && payerName) successClientName.value = payerName;
+              if (successOverlay) successOverlay.classList.add('active');
             } else {
               alert("El pago fue rechazado. Intenta con otra tarjeta.");
             }
@@ -444,6 +467,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }).render("#paypal-button-container");
     
     paypalButtonsRendered = true;
+  }
+
+  // Success Modal logic
+  const successOverlay = document.getElementById('successOverlay');
+  const successCloseBtn = document.getElementById('successCloseBtn');
+  const successWaBtn = document.getElementById('successWaBtn');
+  const successDownloadBtn = document.getElementById('successDownloadBtn');
+  const successClientName = document.getElementById('successClientName');
+  const successOrderId = document.getElementById('successOrderId');
+
+  const closeSuccessModal = () => {
+    if (successOverlay) successOverlay.classList.remove('active');
+  };
+
+  if (successCloseBtn) successCloseBtn.addEventListener('click', closeSuccessModal);
+  
+  if (successDownloadBtn) {
+    successDownloadBtn.addEventListener('click', () => {
+      const data = window.lastReceiptData;
+      if (!data) return;
+      
+      const clientName = (successClientName && successClientName.value.trim()) ? successClientName.value.trim() : (data.payer || 'Cliente');
+      
+      let itemsHtml = '';
+      data.items.forEach(item => {
+        itemsHtml += `
+          <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-size: 15px;">
+            <span style="color: #444;">${item.qty}x ${item.name}</span>
+            <span style="font-weight: 600; color: #111;">$${(item.price * item.qty).toLocaleString('es-MX')} MXN</span>
+          </div>
+        `;
+      });
+
+      const printArea = document.getElementById('printReceiptArea');
+      if (!printArea) return;
+
+      printArea.innerHTML = `
+        <div style="font-family: 'Arial', sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #333;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #060e1f; margin: 0; font-size: 24px;">Corporativo Migratorio Gutiérrez</h1>
+            <h2 style="color: #c9a84c; margin: 5px 0 0 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px;">Comprobante de Pago</h2>
+          </div>
+          
+          <div style="background: #f9f9f9; padding: 24px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Monto Total Pagado</div>
+              <div style="font-size: 36px; font-weight: bold; color: #060e1f; margin-top: 5px;">$${data.total.toLocaleString('es-MX')} MXN</div>
+              <div style="display: inline-block; background: #e6f8ec; color: #16a34a; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 12px; border: 1px solid #bbf7d0;">
+                ✔ PAGO APROBADO
+              </div>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+              <tr><td style="padding: 10px 0; color: #666; border-bottom: 1px solid #eee;">Fecha y Hora:</td><td style="padding: 10px 0; text-align: right; font-weight: bold; border-bottom: 1px solid #eee;">${data.date}</td></tr>
+              <tr><td style="padding: 10px 0; color: #666; border-bottom: 1px solid #eee;">Folio de Autorización:</td><td style="padding: 10px 0; text-align: right; font-weight: bold; font-family: monospace; font-size: 16px; border-bottom: 1px solid #eee;">${data.orderId}</td></tr>
+              <tr><td style="padding: 10px 0; color: #666;">Nombre del Cliente:</td><td style="padding: 10px 0; text-align: right; font-weight: bold;">${clientName}</td></tr>
+            </table>
+          </div>
+
+          <h3 style="font-size: 16px; color: #060e1f; border-bottom: 2px solid #060e1f; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Detalle de Servicios</h3>
+          ${itemsHtml}
+          
+          <div style="margin-top: 50px; text-align: center; font-size: 13px; color: #888; line-height: 1.6;">
+            <p>Este documento es un comprobante de pago electrónico válido.<br>Por favor guárdelo para cualquier aclaración sobre su trámite migratorio.</p>
+            <p style="margin-top: 15px; font-weight: bold; color: #666;">Gracias por su confianza.</p>
+          </div>
+        </div>
+      `;
+
+      // Wait a tiny bit for the DOM to update, then print
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    });
+  }
+
+  if (successWaBtn) {
+    successWaBtn.addEventListener('click', () => {
+      const clientName = (successClientName && successClientName.value.trim()) ? successClientName.value.trim() : 'Cliente';
+      const orderId = (successOrderId && successOrderId.textContent) ? successOrderId.textContent : 'Desconocida';
+      
+      const message = `Hola Corporativo Migratorio Gutiérrez, acabo de realizar el pago de mi(s) servicio(s).\n\n*Nombre:* ${clientName}\n*Orden PayPal:* ${orderId}\n\nAdjunto mi comprobante de pago para iniciar mi trámite.`;
+      
+      const waUrl = `https://wa.me/5217621259045?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+      closeSuccessModal();
+    });
   }
 
 });
