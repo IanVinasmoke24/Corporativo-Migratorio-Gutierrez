@@ -402,26 +402,20 @@ document.addEventListener('DOMContentLoaded', () => {
     container.innerHTML = '';
 
     paypal.Buttons({
-      createOrder: function () {
-        return fetch("/api/create-paypal-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: cart }),
-        })
-          .then((res) => res.json())
-          .then((orderData) => {
-            if (orderData.id) return orderData.id;
-            throw new Error(orderData.error || "Failed to create order");
-          });
+      createOrder: function (data, actions) {
+        const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2);
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              currency_code: "MXN",
+              value: total
+            },
+            description: "Servicios Migratorios CMG"
+          }]
+        });
       },
       onApprove: function (data, actions) {
-        return fetch("/api/capture-paypal-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID: data.orderID }),
-        })
-          .then((res) => res.json())
-          .then((captureData) => {
+        return actions.order.capture().then((captureData) => {
             if (captureData.status === "COMPLETED") {
               const orderId = captureData.id || "N/A";
               let payerName = "";
