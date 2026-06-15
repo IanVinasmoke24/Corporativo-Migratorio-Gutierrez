@@ -1210,33 +1210,8 @@
         </div>
       </div>
       
-      <!-- PayPal Hosted Fields Form -->
-      <div id="paypal-card-form" class="hf-form" style="display:none;">
-        <div class="hf-group">
-          <label for="card-number">Número de tarjeta</label>
-          <div id="card-number" class="hf-field"></div>
-        </div>
-        <div class="hf-row">
-          <div class="hf-group hf-half">
-            <label for="expiration-date">Vencimiento</label>
-            <div id="expiration-date" class="hf-field"></div>
-          </div>
-          <div class="hf-group hf-half">
-            <label for="cvv">CVV</label>
-            <div id="cvv" class="hf-field"></div>
-          </div>
-        </div>
-        <div id="card-errors" class="hf-errors" style="display:none;"></div>
-      </div>
-
-      <p class="cart-mp-note">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:#003087;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        Pago 100% seguro con tarjeta
-      </p>
-      <button class="cart-checkout-btn" id="cartCheckoutBtn" style="background: linear-gradient(135deg, #003087, #009cde); border: none; width: 100%; cursor: pointer;">
-        <span id="checkoutBtnText">Pagar Ahora</span>
-        <div class="spinner" id="checkoutSpinner" style="display:none; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;"></div>
-      </button>
+      <!-- PayPal Smart Buttons -->
+      <div id="paypal-button-container" style="margin-top: 15px; display: none;"></div>
       <button class="cart-clear-btn" id="cartClearBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         Vaciar carrito
@@ -1268,7 +1243,7 @@
     </div>
   </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=AUMttI-WnufgOKikCLcqDGDOx65JU6dW_fjEPSITJyJjthRCLJGYH-KhZNqtVVOxv4UhnzaVulob2tNY&components=buttons,hosted-fields&currency=MXN"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AUMttI-WnufgOKikCLcqDGDOx65JU6dW_fjEPSITJyJjthRCLJGYH-KhZNqtVVOxv4UhnzaVulob2tNY&currency=MXN"></script>
   <script src="main.js"></script>
 </body>
 

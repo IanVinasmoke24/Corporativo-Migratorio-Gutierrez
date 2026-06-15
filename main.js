@@ -271,11 +271,11 @@ document.addEventListener('DOMContentLoaded', () => {
     cartItemsList.style.display = hasItems ? 'flex' : 'none';
     cartFooter.style.display = hasItems ? 'block' : 'none';
 
-    const cardForm = document.getElementById('paypal-card-form');
-    if (cardForm) cardForm.style.display = hasItems ? 'flex' : 'none';
+    const btnContainer = document.getElementById('paypal-button-container');
+    if (btnContainer) btnContainer.style.display = hasItems ? 'block' : 'none';
 
-    if (hasItems && !hostedFieldsInstance) {
-      initPayPalHostedFields();
+    if (hasItems && !paypalButtonsRendered) {
+      renderPayPalButtons();
     }
 
     cart.forEach(item => {
@@ -385,25 +385,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize cart UI
   renderCart();
 
-  // Hosted Fields Implementation
-  let hostedFieldsInstance = null;
+  // PayPal Smart Buttons Implementation
+  let paypalButtonsRendered = false;
 
-  function initPayPalHostedFields() {
-    if (!window.paypal || !window.paypal.HostedFields) {
+  function renderPayPalButtons() {
+    if (!window.paypal) {
       console.warn('PayPal SDK not loaded yet, retrying in 500ms...');
-      setTimeout(initPayPalHostedFields, 500);
+      setTimeout(renderPayPalButtons, 500);
       return;
     }
 
-    if (hostedFieldsInstance) return;
+    if (paypalButtonsRendered) return;
+    
+    const container = document.getElementById('paypal-button-container');
+    if (!container) return;
+    container.innerHTML = '';
 
-    if (!paypal.HostedFields.isEligible()) {
-      showError("Tu cuenta de PayPal actual no tiene habilitado el Procesamiento Avanzado de Tarjetas. Por favor habilítalo en la configuración de PayPal.");
-      console.error("PayPal Hosted Fields no es elegible.");
-      return;
-    }
-
-    paypal.HostedFields.render({
+    paypal.Buttons({
       createOrder: function () {
         return fetch("/api/create-paypal-order", {
           method: "POST",
@@ -416,86 +414,36 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(orderData.error || "Failed to create order");
           });
       },
-      styles: {
-        input: {
-          "font-size": "16px",
-          "font-family": "Inter, sans-serif",
-          color: "#ffffff",
-        },
-        ".invalid": { color: "#e63946" },
+      onApprove: function (data, actions) {
+        return fetch("/api/capture-paypal-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID: data.orderID }),
+        })
+          .then((res) => res.json())
+          .then((captureData) => {
+            if (captureData.status === "COMPLETED") {
+              cart = [];
+              updateBadge();
+              renderCart();
+              alert("¡Pago exitoso! Nos pondremos en contacto contigo pronto para tu servicio.");
+              closeCart();
+            } else {
+              alert("El pago fue rechazado. Intenta con otra tarjeta.");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("Hubo un problema al procesar la tarjeta.");
+          });
       },
-      fields: {
-        number: { selector: "#card-number" },
-        cvv: { selector: "#cvv" },
-        expirationDate: { selector: "#expiration-date" },
-      },
-    })
-      .then(function (hf) {
-        hostedFieldsInstance = hf;
-        const checkoutBtn = document.getElementById("cartCheckoutBtn");
-        checkoutBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          if (cart.length === 0) return;
-          
-          setLoading(true);
-          const errDiv = document.getElementById("card-errors");
-          errDiv.style.display = "none";
-
-          hf.submit()
-            .then(function (payload) {
-              return fetch("/api/capture-paypal-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ orderID: payload.orderId }),
-              });
-            })
-            .then((res) => res.json())
-            .then((captureData) => {
-              setLoading(false);
-              if (captureData.status === "COMPLETED") {
-                cart = [];
-                updateBadge();
-                renderCart();
-                alert("¡Pago exitoso! Tu orden ha sido procesada.");
-                closeCart();
-              } else {
-                showError("El pago fue rechazado. Intenta con otra tarjeta.");
-              }
-            })
-            .catch(function (err) {
-              setLoading(false);
-              console.error(err);
-              showError("Hubo un problema al procesar la tarjeta.");
-            });
-        });
-      })
-      .catch(function (err) {
-        console.error("Hosted Fields render error:", err);
-        showError("Ocurrió un error al cargar el formulario seguro de tarjeta. Verifica tus claves de PayPal o tu conexión.");
-      });
-  }
-
-  function setLoading(isLoading) {
-    const btnText = document.getElementById("checkoutBtnText");
-    const spinner = document.getElementById("checkoutSpinner");
-    const btn = document.getElementById("cartCheckoutBtn");
-    if (isLoading) {
-      btnText.style.display = "none";
-      spinner.style.display = "block";
-      btn.style.opacity = "0.7";
-      btn.style.pointerEvents = "none";
-    } else {
-      btnText.style.display = "block";
-      spinner.style.display = "none";
-      btn.style.opacity = "1";
-      btn.style.pointerEvents = "all";
-    }
-  }
-
-  function showError(msg) {
-    const errDiv = document.getElementById("card-errors");
-    errDiv.textContent = msg;
-    errDiv.style.display = "block";
+      onError: function (err) {
+        console.error("PayPal Buttons Error:", err);
+        alert("Ocurrió un error al cargar el pago. Intenta de nuevo o verifica tu conexión.");
+      }
+    }).render("#paypal-button-container");
+    
+    paypalButtonsRendered = true;
   }
 
 });
