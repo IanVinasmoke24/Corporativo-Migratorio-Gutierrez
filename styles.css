@@ -1753,6 +1753,9 @@ ul { list-style: none; }
   transition: var(--transition);
   box-shadow: 0 4px 12px rgba(37,211,102,0.3);
 }
+.product-btn-wa svg {
+  flex-shrink: 0;
+}
 .product-btn-wa:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(37,211,102,0.5);
