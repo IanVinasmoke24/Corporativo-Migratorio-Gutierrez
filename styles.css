@@ -2116,3 +2116,65 @@ ul { list-style: none; }
     width: 48px;
   }
 }
+
+/* ========================================
+   PAYPAL HOSTED FIELDS
+   ======================================== */
+.hf-form {
+  background: var(--white-5);
+  border: 1px solid var(--white-10);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hf-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hf-row {
+  display: flex;
+  gap: 12px;
+}
+.hf-half {
+  flex: 1;
+}
+.hf-group label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--white-80);
+}
+.hf-field {
+  height: 40px;
+  background: var(--navy-deep);
+  border: 1px solid var(--white-20);
+  border-radius: 6px;
+  padding: 0 12px;
+  transition: var(--transition);
+}
+.hf-field.paypal-hosted-field-focused {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-20);
+}
+.hf-field.paypal-hosted-field-invalid {
+  border-color: #e63946;
+}
+.hf-errors {
+  color: #e63946;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .hf-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

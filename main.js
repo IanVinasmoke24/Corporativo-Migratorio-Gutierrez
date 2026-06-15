@@ -262,18 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     cartSubtotal.textContent = formatPrice(subtotal);
     cartTotal.textContent = formatPrice(subtotal);
-    updateCheckoutLink();
-  }
-
-  function updateCheckoutLink() {
-    const checkoutBtn = document.getElementById('cartCheckoutBtn');
-    if (!checkoutBtn) return;
-    if (cart.length === 0) { checkoutBtn.href = '#'; return; }
-
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    const url = `https://www.paypal.com/paypalme/consultoriajas/${subtotal}MXN`;
-    console.log('PayPal URL generada:', url);
-    checkoutBtn.href = url;
   }
 
   function renderCart() {
@@ -282,6 +270,13 @@ document.addEventListener('DOMContentLoaded', () => {
     cartEmpty.style.display = hasItems ? 'none' : 'flex';
     cartItemsList.style.display = hasItems ? 'flex' : 'none';
     cartFooter.style.display = hasItems ? 'block' : 'none';
+
+    const cardForm = document.getElementById('paypal-card-form');
+    if (cardForm) cardForm.style.display = hasItems ? 'flex' : 'none';
+
+    if (hasItems && !hostedFieldsInstance) {
+      initPayPalHostedFields();
+    }
 
     cart.forEach(item => {
       const li = document.createElement('li');
@@ -383,13 +378,118 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateBadge();
     renderCart();
-    updateCheckoutLink(); // forzar actualización del link de pago
     showToast(name);
     openCart();
   };
 
   // Initialize cart UI
   renderCart();
+
+  // Hosted Fields Implementation
+  let hostedFieldsInstance = null;
+
+  function initPayPalHostedFields() {
+    if (!window.paypal || !window.paypal.HostedFields) {
+      console.warn('PayPal SDK not loaded yet, retrying in 500ms...');
+      setTimeout(initPayPalHostedFields, 500);
+      return;
+    }
+
+    if (hostedFieldsInstance) return;
+
+    paypal.HostedFields.render({
+      createOrder: function () {
+        return fetch("/api/create-paypal-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: cart }),
+        })
+          .then((res) => res.json())
+          .then((orderData) => {
+            if (orderData.id) return orderData.id;
+            throw new Error(orderData.error || "Failed to create order");
+          });
+      },
+      styles: {
+        input: {
+          "font-size": "16px",
+          "font-family": "Inter, sans-serif",
+          color: "#ffffff",
+        },
+        ".invalid": { color: "#e63946" },
+      },
+      fields: {
+        number: { selector: "#card-number" },
+        cvv: { selector: "#cvv" },
+        expirationDate: { selector: "#expiration-date" },
+      },
+    })
+      .then(function (hf) {
+        hostedFieldsInstance = hf;
+        const checkoutBtn = document.getElementById("cartCheckoutBtn");
+        checkoutBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (cart.length === 0) return;
+          
+          setLoading(true);
+          const errDiv = document.getElementById("card-errors");
+          errDiv.style.display = "none";
+
+          hf.submit()
+            .then(function (payload) {
+              return fetch("/api/capture-paypal-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderID: payload.orderId }),
+              });
+            })
+            .then((res) => res.json())
+            .then((captureData) => {
+              setLoading(false);
+              if (captureData.status === "COMPLETED") {
+                cart = [];
+                updateBadge();
+                renderCart();
+                alert("¡Pago exitoso! Tu orden ha sido procesada.");
+                closeCart();
+              } else {
+                showError("El pago fue rechazado. Intenta con otra tarjeta.");
+              }
+            })
+            .catch(function (err) {
+              setLoading(false);
+              console.error(err);
+              showError("Hubo un problema al procesar la tarjeta.");
+            });
+        });
+      })
+      .catch(function (err) {
+        console.error("Hosted Fields render error:", err);
+      });
+  }
+
+  function setLoading(isLoading) {
+    const btnText = document.getElementById("checkoutBtnText");
+    const spinner = document.getElementById("checkoutSpinner");
+    const btn = document.getElementById("cartCheckoutBtn");
+    if (isLoading) {
+      btnText.style.display = "none";
+      spinner.style.display = "block";
+      btn.style.opacity = "0.7";
+      btn.style.pointerEvents = "none";
+    } else {
+      btnText.style.display = "block";
+      spinner.style.display = "none";
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "all";
+    }
+  }
+
+  function showError(msg) {
+    const errDiv = document.getElementById("card-errors");
+    errDiv.textContent = msg;
+    errDiv.style.display = "block";
+  }
 
 });
 
