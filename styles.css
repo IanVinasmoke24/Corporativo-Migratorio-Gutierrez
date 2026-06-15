@@ -2091,11 +2091,11 @@ ul { list-style: none; }
 .cart-toast svg { color: var(--gold); }
 
 @media (max-width: 480px) {
-  .cart-drawer { width: 100vw; border-left: none; }
+  .cart-drawer { width: 100vw; border-left: none; display: block; overflow-y: auto; }
   .product-add-cart { font-size: 0.78rem; padding: 11px 10px; gap: 5px; }
   .product-btn-wa::after { content: " WhatsApp"; }
-  .cart-drawer-header { padding: 18px 16px 16px; }
-  .cart-body { padding: 12px; }
+  .cart-drawer-header { padding: 18px 16px 16px; position: sticky; top: 0; background: var(--navy-deep); z-index: 10; border-bottom: 1px solid var(--white-10); }
+  .cart-body { padding: 12px; overflow-y: visible; }
   .cart-footer { padding: 16px 16px 24px; }
   .cart-checkout-btn { font-size: 0.95rem; padding: 14px 16px; }
   .cart-count-label { display: none; }
