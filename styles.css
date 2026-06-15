@@ -2149,12 +2149,15 @@ ul { list-style: none; }
   color: var(--white-80);
 }
 .hf-field {
-  height: 40px;
+  min-height: 45px;
   background: var(--navy-deep);
   border: 1px solid var(--white-20);
   border-radius: 6px;
-  padding: 0 12px;
+  padding: 10px 12px;
   transition: var(--transition);
+  position: relative;
+  z-index: 5;
+  cursor: text;
 }
 .hf-field.paypal-hosted-field-focused {
   border-color: var(--gold);
