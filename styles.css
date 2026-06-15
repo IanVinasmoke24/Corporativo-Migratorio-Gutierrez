@@ -1543,16 +1543,6 @@ ul { list-style: none; }
   /* ── Product cards ── */
   .product-card  { flex-direction: column; }
   .product-img-wrap { width: 100%; height: 180px; }
-  .product-actions { flex-direction: column; gap: 8px; }
-  .product-btn-wa {
-    width: 100%;
-    padding: 11px;
-    justify-content: center;
-    gap: 8px;
-    font-size: 0.82rem;
-    font-weight: 600;
-  }
-  .product-btn-wa::after { content: " Consultar por WhatsApp"; }
   .product-add-cart { font-size: 0.88rem; padding: 13px 16px; }
 
   /* ── Cart drawer on mobile ── */
@@ -2097,7 +2087,6 @@ ul { list-style: none; }
 @media (max-width: 480px) {
   .cart-drawer { width: 100vw; border-left: none; display: block; overflow-y: auto; }
   .product-add-cart { font-size: 0.78rem; padding: 11px 10px; gap: 5px; }
-  .product-btn-wa::after { content: " WhatsApp"; }
   .cart-drawer-header { padding: 18px 16px 16px; position: sticky; top: 0; background: var(--navy-deep); z-index: 10; border-bottom: 1px solid var(--white-10); }
   .cart-body { padding: 12px; overflow-y: visible; }
   .cart-footer { padding: 16px 16px 24px; }
