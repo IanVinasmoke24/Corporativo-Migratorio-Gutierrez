@@ -397,6 +397,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (hostedFieldsInstance) return;
 
+    if (!paypal.HostedFields.isEligible()) {
+      showError("Tu cuenta de PayPal actual no tiene habilitado el Procesamiento Avanzado de Tarjetas. Por favor habilítalo en la configuración de PayPal.");
+      console.error("PayPal Hosted Fields no es elegible.");
+      return;
+    }
+
     paypal.HostedFields.render({
       createOrder: function () {
         return fetch("/api/create-paypal-order", {
@@ -465,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(function (err) {
         console.error("Hosted Fields render error:", err);
+        showError("Ocurrió un error al cargar el formulario seguro de tarjeta. Verifica tus claves de PayPal o tu conexión.");
       });
   }
 
