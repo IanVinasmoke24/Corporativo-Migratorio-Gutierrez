@@ -451,12 +451,12 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           .catch((err) => {
             console.error(err);
-            alert("Hubo un problema al procesar la tarjeta.");
+            alert("Hubo un problema al procesar la tarjeta. Detalles: " + (err.message || JSON.stringify(err)));
           });
       },
       onError: function (err) {
         console.error("PayPal Buttons Error:", err);
-        alert("Ocurrió un error al cargar el pago. Intenta de nuevo o verifica tu conexión.");
+        alert("Ocurrió un error al cargar el pago. Error técnico: " + (err.message || err.toString()));
       }
     }).render("#paypal-button-container");
     
