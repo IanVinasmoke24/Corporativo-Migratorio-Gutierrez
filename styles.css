@@ -748,6 +748,23 @@ ul { list-style: none; }
   flex-direction: column;
   gap: 3px;
   margin-bottom: 12px;
+  overflow-y: auto;
+  max-height: 110px;
+  padding-right: 6px;
+}
+.product-includes::-webkit-scrollbar {
+  width: 4px;
+}
+.product-includes::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+.product-includes::-webkit-scrollbar-thumb {
+  background: var(--gold-40);
+  border-radius: 4px;
+}
+.product-includes::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
 .product-includes li {
   font-size: 0.76rem;
