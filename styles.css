@@ -402,20 +402,20 @@ ul { list-style: none; }
   background: var(--white-20);
 }
 .hero-scroll {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   color: var(--white-60);
-  font-size: 0.75rem;
+  text-decoration: none;
+  font-size: 0.85rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  animation: fadeIn 1s 1s ease both;
+  transition: color 0.3s;
+  animation: float 3s ease-in-out infinite;
+  margin: 60px auto 0;
+  width: max-content;
 }
 .scroll-line {
   width: 1px;
