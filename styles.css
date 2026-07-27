@@ -553,12 +553,11 @@ ul { list-style: none; }
    ======================================== */
 .catalog-carousel-wrapper {
   position: relative;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
   padding: 0 32px; /* espacio para las flechas */
 }
 .catalog-grid {
   display: flex;
-  align-items: start;
   gap: 24px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -600,7 +599,7 @@ ul { list-style: none; }
 /* ---- Flechas de navegación ---- */
 .carousel-arrow {
   position: absolute;
-  top: 50%;
+  top: 70px;
   transform: translateY(-50%);
   z-index: 10;
   width: 48px;
@@ -639,7 +638,7 @@ ul { list-style: none; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 .catalog-dot {
   width: 8px;
