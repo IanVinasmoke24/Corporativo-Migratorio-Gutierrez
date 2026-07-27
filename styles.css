@@ -558,6 +558,7 @@ ul { list-style: none; }
 }
 .catalog-grid {
   display: flex;
+  align-items: start;
   gap: 24px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
