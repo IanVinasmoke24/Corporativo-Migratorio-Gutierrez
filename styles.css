@@ -781,6 +781,158 @@ ul { list-style: none; }
 
 
 /* ========================================
+   CARRITO – Botón del nav
+   ======================================== */
+.nav-cart-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--white-10);
+  border: 1.5px solid var(--white-20);
+  color: var(--white);
+  padding: 9px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.nav-cart-btn:hover {
+  background: var(--gold-20);
+  border-color: var(--gold);
+  color: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+.cart-total-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba(230,57,70,0.5);
+  animation: badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes badge-pop {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* ========================================
+   CATÁLOGO – Botones de producto
+   ======================================== */
+.product-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.product-add-cart {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--navy-deep);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+  white-space: nowrap;
+}
+.product-add-cart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(201,168,76,0.5);
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+}
+.product-add-cart:active {
+  transform: scale(0.97);
+}
+.product-btn-wa {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+}
+.product-btn-wa:hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 8px 28px rgba(37,211,102,0.5);
+}
+.product-btn-wa svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================
+   WHATSAPP FLOTANTE
+   ======================================== */
+.floating-wa {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  width: 62px;
+  height: 62px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(37,211,102,0.45);
+  transition: var(--transition);
+  text-decoration: none;
+}
+.floating-wa:hover {
+  transform: scale(1.12) translateY(-3px);
+  box-shadow: 0 14px 40px rgba(37,211,102,0.6);
+}
+.floating-wa svg {
+  width: 30px;
+  height: 30px;
+}
+.wa-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(37,211,102,0.4);
+  animation: wa-ring 2.2s ease-out infinite;
+}
+@keyframes wa-ring {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+/* ========================================
    REFERENCIAS / TESTIMONIOS
    ======================================== */
 .referencias {
