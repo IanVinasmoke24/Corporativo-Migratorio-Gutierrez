@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Scroll reveal animation ───────────────────────
   const revealEls = document.querySelectorAll(
-    '.service-card, .product-card, .about-content, .about-visual, .process-step, .contact-card, .stat-item, .value-item'
+    '.service-card, .about-content, .about-visual, .process-step, .contact-card, .stat-item, .value-item'
   );
 
   revealEls.forEach(el => el.classList.add('reveal'));
@@ -106,24 +106,130 @@ document.addEventListener('DOMContentLoaded', () => {
 
   revealEls.forEach(el => revealObserver.observe(el));
 
-  // ── Catalog filter tabs ───────────────────────────
-  const catTabs = document.querySelectorAll('.cat-tab');
-  const productCards = document.querySelectorAll('.product-card');
+  // ── Catalog carousel ─────────────────────────────
+  const grid       = document.getElementById('catalogGrid');
+  const prevBtn    = document.getElementById('carouselPrev');
+  const nextBtn    = document.getElementById('carouselNext');
+  const dotsWrap   = document.getElementById('catalogDots');
+  const catTabs    = document.querySelectorAll('.cat-tab');
 
+  // ---- Helpers ----
+  const getVisibleCards = () =>
+    Array.from(document.querySelectorAll('.product-card:not(.hidden)'));
+
+  const getCardWidth = () => {
+    const card = grid.querySelector('.product-card:not(.hidden)');
+    if (!card) return 340;
+    const style = getComputedStyle(grid);
+    const gap = parseFloat(style.gap) || 24;
+    return card.offsetWidth + gap;
+  };
+
+  // ---- Dots ----
+  let currentIndex = 0;
+  const buildDots = () => {
+    dotsWrap.innerHTML = '';
+    const cards = getVisibleCards();
+    cards.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'catalog-dot' + (i === currentIndex ? ' active' : '');
+      dot.setAttribute('aria-label', `Servicio ${i + 1}`);
+      dot.addEventListener('click', () => scrollToIndex(i));
+      dotsWrap.appendChild(dot);
+    });
+  };
+
+  const updateDots = (index) => {
+    currentIndex = index;
+    dotsWrap.querySelectorAll('.catalog-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+  };
+
+  // ---- Arrow state ----
+  const updateArrows = () => {
+    const cards = getVisibleCards();
+    prevBtn.classList.toggle('disabled', currentIndex <= 0);
+    nextBtn.classList.toggle('disabled', currentIndex >= cards.length - 1);
+  };
+
+  // ---- Scroll to card ----
+  const scrollToIndex = (index) => {
+    const cards = getVisibleCards();
+    if (!cards[index]) return;
+    const cardW = getCardWidth();
+    grid.scrollTo({ left: index * cardW, behavior: 'smooth' });
+    updateDots(index);
+    updateArrows();
+  };
+
+  // ---- Scroll → detect active dot ----
+  let scrollTimer;
+  grid.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const cardW = getCardWidth();
+      const newIndex = Math.round(grid.scrollLeft / cardW);
+      if (newIndex !== currentIndex) {
+        updateDots(newIndex);
+        updateArrows();
+      }
+    }, 60);
+  }, { passive: true });
+
+  // ---- Arrow clicks ----
+  prevBtn.addEventListener('click', () => {
+    const cards = getVisibleCards();
+    const newIdx = Math.max(0, currentIndex - 1);
+    scrollToIndex(newIdx);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    const cards = getVisibleCards();
+    const newIdx = Math.min(cards.length - 1, currentIndex + 1);
+    scrollToIndex(newIdx);
+  });
+
+  // ---- Swipe táctil ----
+  let touchStartX = 0;
+  grid.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  grid.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      const cards = getVisibleCards();
+      if (diff > 0) scrollToIndex(Math.min(cards.length - 1, currentIndex + 1));
+      else           scrollToIndex(Math.max(0, currentIndex - 1));
+    }
+  }, { passive: true });
+
+  // ---- Filter tabs ----
   catTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       catTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const cat = tab.dataset.cat;
-      productCards.forEach(card => {
+      document.querySelectorAll('.product-card').forEach(card => {
         if (cat === 'all' || card.dataset.cat === cat) {
           card.classList.remove('hidden');
         } else {
           card.classList.add('hidden');
         }
       });
+      // Reset carrusel al cambiar categoría
+      grid.scrollTo({ left: 0, behavior: 'smooth' });
+      currentIndex = 0;
+      buildDots();
+      updateArrows();
     });
   });
+
+  // ---- Inicializar ----
+  buildDots();
+  updateArrows();
+
+
 
 
   // ── Active nav link on scroll ─────────────────────
